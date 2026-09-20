@@ -9,7 +9,7 @@ export default function Layout({ children, activePage, setActivePage, onSignOut 
 
   return (
     <div className="min-h-screen bg-[#030712]/50 text-slate-100 flex relative overflow-x-hidden">
-      {/* 3D Dynamic Live Water Simulation */}
+      {/* 3D Dynamic Live Water Surface */}
       <WaterCanvasBackground opacity={0.9} interactive={true} />
 
       {/* Sidebar Navigation */}

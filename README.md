@@ -27,7 +27,6 @@ WATER BODY / BASIN
        ▼ (HTTP POST /api/sensor-data)
 [ NODE.JS & EXPRESS BACKEND ]
   ├── Alert Evaluation Engine (Scientific Threshold Triage)
-  ├── Realistic Hydrology Anomaly Simulator (SIH Demo Mode)
   ├── Dual-Mode Database Engine:
   │     ├── MongoDB Atlas (Production & Historical Archive)
   │     └── Resilient Local Memory & Cache Engine (Zero-Dependency Fallback)
@@ -99,8 +98,6 @@ MONGODB_URI=mongodb://localhost:27017/jal_rakshak   # Optional
 DEFAULT_DEVICE_ID=JR001
 STATION_NAME="JAL-RAKSHAK NODE 01"
 OFFLINE_TIMEOUT_SECONDS=20
-DEMO_SIMULATION_ENABLED=true
-DEMO_INTERVAL_MS=3000
 ```
 
 ---
@@ -116,48 +113,38 @@ npm run dev
 
 ---
 
-## 🧪 Demo Mode for Smart India Hackathon (SIH)
+## 📡 Pure Hardware Mode (ESP32 & Real Sensors)
 
-The platform includes a built-in realistic environmental telemetry simulator and anomaly trigger engine. This allows demonstrating the platform live even when physical ESP32 hardware is not connected.
+The platform runs strictly in **Pure Hardware Live Mode**. There is no mock or simulated database. All stored telemetry, live visualizations, and alerts are generated exclusively from physical sensor readings transmitted by your ESP32 microcontroller.
 
-1. **Continue as Demo**: On the landing page, click **"Continue as Demo (SIH Prototype)"**.
-2. **Realistic Natural Drift**: Values drift smoothly within normal natural baselines:
-   - pH: $6.9 - 7.5$
-   - TDS: $150 - 350\text{ ppm}$
-   - Turbidity: $1.0 - 4.0\text{ NTU}$
-   - Temperature: $24 - 30^\circ\text{C}$
-   - Water Level: $70 - 90\%$
-3. **Live Anomaly Triggers** (in Settings or Topbar):
-   - **Turbidity Surge**: Simulates gradual silt/sediment runoff ($NTU > 8.5$), causing the Turbidity Card to visually cloud over and triggering warning alerts.
-   - **Acidic Basin Shift**: Drops pH below $6.2$ to verify chemical deviation alarms.
-   - **Thermal Anomaly**: Spikes temperature above $34^\circ\text{C}$.
-   - **Low Water Head**: Drops reservoir level to $15\%$ to demonstrate dry-run pump safety early-warning.
-   - **Reset Baseline**: Instantly returns all parameters to pristine clear water.
+1. **Hardware Connection**: Connect your ESP32 to Wi-Fi.
+2. **Telemetry Dispatch**: The ESP32 reads physical analog/digital pins and POSTs to `/api/sensor-data`:
+   - pH (Pin 34 - ADC1)
+   - TDS (Pin 35 - ADC1)
+   - Turbidity (Pin 32 - ADC1)
+   - Temperature (Pin 4 - OneWire DS18B20)
+   - Water Level (Pin 5 Trig, Pin 18 Echo)
+3. **Real-time Live Stream**: The backend ingests the reading, evaluates scientific thresholds, stores it to the database, and streams the values to the React Command Center via WebSockets (Socket.IO).
 
 ---
 
 ## 📡 ESP32 Ingestion API Contract
 
-### POST `/api/sensor-data`
-Physical ESP32 microcontrollers send telemetry via HTTP POST:
+When the ESP32 samples its physical sensors, it transmits an HTTP `POST` to:
+```http
+POST http://<YOUR_BACKEND_IP>:5000/api/sensor-data
+Content-Type: application/json
+```
 
+**Payload Schema:**
 ```json
 {
   "deviceId": "JR001",
-  "ph": 7.21,
-  "tds": 245,
-  "turbidity": 2.3,
-  "temperature": 27.4,
-  "waterLevel": 82
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Sensor data received",
-  "healthScore": 88
+  "ph": 7.34,
+  "tds": 240,
+  "turbidity": 2.15,
+  "temperature": 26.8,
+  "waterLevel": 85.0
 }
 ```
 
@@ -167,12 +154,12 @@ A complete Arduino C++ sketch is available in:
 
 ---
 
-## 📊 REST API Reference
+## ⚙️ Backend API Endpoints
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | Service health status |
-| `POST`| `/api/sensor-data` | Ingest sensor telemetry |
+| Method| Endpoint | Description |
+| :---  | :--- | :--- |
+| `GET` | `/api/health` | Backend and database connectivity health probe |
+| `POST`| `/api/sensor-data` | Ingest sensor telemetry from ESP32 |
 | `GET` | `/api/sensor-data/latest` | Retrieve latest reading & connection timeout |
 | `GET` | `/api/sensor-data/history` | Retrieve time-series dataset (1h, 6h, 24h, 7d, 30d) |
 | `GET` | `/api/sensor-data/export` | Download real-time historical dataset as CSV |
@@ -182,9 +169,6 @@ A complete Arduino C++ sketch is available in:
 | `GET` | `/api/reports/generate` | Generate Daily, Weekly, or Monthly hydrology reports |
 | `GET` | `/api/settings` | Query threshold calibration limits |
 | `POST`| `/api/settings` | Update alert thresholds |
-| `POST`| `/api/simulation/toggle` | Pause / resume telemetry simulator |
-| `POST`| `/api/simulation/anomaly`| Inject presentation anomaly scenario |
-| `POST`| `/api/simulation/reset` | Reset simulation baseline to pristine condition |
 
 ---
 

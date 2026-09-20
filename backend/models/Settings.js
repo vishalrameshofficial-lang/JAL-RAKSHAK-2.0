@@ -47,11 +47,6 @@ const settingsSchema = new mongoose.Schema({
     emailAlerts: { type: Boolean, default: false },
     browserPush: { type: Boolean, default: true },
     soundEnabled: { type: Boolean, default: true }
-  },
-  simulation: {
-    enabled: { type: Boolean, default: true },
-    intervalMs: { type: Number, default: 3000 },
-    anomalyMode: { type: String, default: 'NONE' } // NONE, TURBIDITY_SURGE, ACID_RUNOFF, TEMP_SPIKE, LOW_WATER
   }
 }, {
   timestamps: true

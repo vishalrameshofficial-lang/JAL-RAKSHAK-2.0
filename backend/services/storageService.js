@@ -26,11 +26,6 @@ const defaultSettings = {
     emailAlerts: false,
     browserPush: true,
     soundEnabled: true
-  },
-  simulation: {
-    enabled: false,
-    intervalMs: 3000,
-    anomalyMode: 'NONE'
   }
 };
 

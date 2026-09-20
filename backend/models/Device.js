@@ -13,8 +13,8 @@ const deviceSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['ONLINE', 'OFFLINE', 'SIMULATION', 'MAINTENANCE'],
-    default: 'ONLINE'
+    enum: ['ONLINE', 'OFFLINE', 'MAINTENANCE'],
+    default: 'OFFLINE'
   },
   lastSeen: {
     type: Date,

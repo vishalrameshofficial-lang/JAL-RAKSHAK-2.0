@@ -38,14 +38,6 @@ class SocketService {
     this.socket.on('alert_status_changed', (data) => {
       this.emitInternal('alert_status_changed', data);
     });
-
-    this.socket.on('simulation_state_changed', (data) => {
-      this.emitInternal('simulation_state_changed', data);
-    });
-
-    this.socket.on('simulation_reset', (data) => {
-      this.emitInternal('simulation_reset', data);
-    });
   }
 
   on(event, callback) {
